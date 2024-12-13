@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import json
 
 
 def parse_bpmn(file_path):
@@ -13,40 +14,53 @@ def parse_bpmn(file_path):
         print("No process found in the BPMN file.")
         return
 
-    elements = {}
-    sequence_flows = []
+    nodes = []
+    edges = []
 
     for element in process:
         tag = element.tag.split("}")[-1]  # Remove namespace
         if tag == "sequenceFlow":
-            sequence_flows.append(
-                {
-                    "id": element.attrib["id"],
-                    "source": element.attrib["sourceRef"],
-                    "target": element.attrib["targetRef"],
-                }
-            )
+            edges.append({
+                "source": element.attrib["sourceRef"],
+                "target": element.attrib["targetRef"]
+            })
         else:
-            elements[element.attrib["id"]] = {
-                "type": tag,
-                "name": element.attrib.get("name", ""),
+            node = {
+                "id": element.attrib["id"],
+                "type": tag
             }
+            if "name" in element.attrib:
+                node["name"] = element.attrib["name"]
+            nodes.append(node)
 
-    return elements, sequence_flows
+    return nodes, edges
 
 
-def display_graph_info(elements, sequence_flows):
-    print("Elements:")
-    for element_id, info in elements.items():
-        print(f"  {element_id}: {info}")
+def display_graph_info(nodes, edges):
+    print("Nodes:")
+    for node in nodes:
+        print(f"  {node}")
 
-    print("\nSequence Flows:")
-    for flow in sequence_flows:
-        print(f"  {flow['id']}: {flow['source']} -> {flow['target']}")
+    print("\nEdges:")
+    for edge in edges:
+        print(f"  {edge['source']} -> {edge['target']}")
+
+
+def save_graph_to_json(nodes, edges, output_path):
+    graph_data = {
+        "nodes": nodes,
+        "edges": edges
+    }
+
+    with open(output_path, "w") as f:
+        json.dump(graph_data, f, indent=2)
 
 
 file_path = "models/first.bpmn"
+output_json = "graph_data.json"
 
-elements, sequence_flows = parse_bpmn(file_path)
-if elements and sequence_flows:
-    display_graph_info(elements, sequence_flows)
+nodes, edges = parse_bpmn(file_path)
+if nodes and edges:
+    display_graph_info(nodes, edges)
+    save_graph_to_json(nodes, edges, output_json)
+    print(f"\nGraph data saved to {output_json}")
