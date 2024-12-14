@@ -1,7 +1,7 @@
 import networkx as nx
 
 
-def json_to_digraph(json_data):
+def json_to_digraph(json_data: dict) -> nx.DiGraph:
     """
     Convert the given JSON graph structure into a directed graph (DiGraph).
     Expected JSON format:
@@ -32,7 +32,7 @@ def json_to_digraph(json_data):
     return G
 
 
-def node_match(n1, n2):
+def node_match(n1: dict, n2: dict) -> bool:
     """
     Compare if two nodes are equal based on their attributes.
     Returns True if the nodes should be considered equal, False otherwise.
@@ -48,7 +48,7 @@ def node_match(n1, n2):
     return True
 
 
-def compute_ged(json_graph_1, json_graph_2):
+def compute_ged(json_graph_1: dict, json_graph_2: dict) -> float:
     """
     Compute the Graph Edit Distance (GED) between two graphs given in JSON format.
     """
