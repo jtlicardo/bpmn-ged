@@ -1,7 +1,7 @@
 [project]
 name = "bpmn-ged"
 version = "0.1.0"
-description = "A tool to compare BPMN diagrams using graph edit distance"
+description = "A tool to compare BPMN diagrams using (relative) graph edit distance"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
