@@ -1,5 +1,5 @@
-import xml.etree.ElementTree as ET
 import json
+import xml.etree.ElementTree as ET
 
 
 def parse_bpmn(file_path):
@@ -52,11 +52,12 @@ def save_graph_to_json(nodes, edges, output_path):
         json.dump(graph_data, f, indent=2)
 
 
-file_path = "models/first.bpmn"
-output_json = "graph_data.json"
+if __name__ == "__main__":
+    file_path = "models/first.bpmn"
+    output_json = "graph_data.json"
 
-nodes, edges = parse_bpmn(file_path)
-if nodes and edges:
-    display_graph_info(nodes, edges)
-    save_graph_to_json(nodes, edges, output_json)
-    print(f"\nGraph data saved to {output_json}")
+    nodes, edges = parse_bpmn(file_path)
+    if nodes and edges:
+        display_graph_info(nodes, edges)
+        save_graph_to_json(nodes, edges, output_json)
+        print(f"\nGraph data saved to {output_json}")
