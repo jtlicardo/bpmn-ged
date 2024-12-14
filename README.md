@@ -28,13 +28,13 @@ This utility compares two BPMN diagrams using Graph Edit Distance (GED) and Rela
 To compare two BPMN files, run the following command:
 
 ```sh
-python src/compare_bpmn.py <path-to-first-bpmn-file> <path-to-second-bpmn-file>
+uv run src/compare_bpmn.py <path-to-first-bpmn-file> <path-to-second-bpmn-file>
 ```
 
 For example:
 
 ```sh
-python src/compare_bpmn.py models/first.bpmn models/second.bpmn
+uv run src/compare_bpmn.py models/first.bpmn models/second.bpmn
 ```
 
 Example output
