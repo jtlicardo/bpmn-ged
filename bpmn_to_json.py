@@ -20,15 +20,14 @@ def parse_bpmn(file_path):
     for element in process:
         tag = element.tag.split("}")[-1]  # Remove namespace
         if tag == "sequenceFlow":
-            edges.append({
-                "source": element.attrib["sourceRef"],
-                "target": element.attrib["targetRef"]
-            })
+            edges.append(
+                {
+                    "source": element.attrib["sourceRef"],
+                    "target": element.attrib["targetRef"],
+                }
+            )
         else:
-            node = {
-                "id": element.attrib["id"],
-                "type": tag
-            }
+            node = {"id": element.attrib["id"], "type": tag}
             if "name" in element.attrib:
                 node["name"] = element.attrib["name"]
             nodes.append(node)
@@ -47,10 +46,7 @@ def display_graph_info(nodes, edges):
 
 
 def save_graph_to_json(nodes, edges, output_path):
-    graph_data = {
-        "nodes": nodes,
-        "edges": edges
-    }
+    graph_data = {"nodes": nodes, "edges": edges}
 
     with open(output_path, "w") as f:
         json.dump(graph_data, f, indent=2)
