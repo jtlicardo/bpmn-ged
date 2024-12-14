@@ -155,6 +155,27 @@ if __name__ == "__main__":
         "edges": [],
     }
 
+    graph_json_4 = {
+        "nodes": [
+            # {"id": "StartEvent_1", "type": "MODIFIED_startEvent"},
+            # {"id": "Activity_14k7ctp", "type": "task", "name": "Write draft"},
+            {"id": "Gateway_1p0lqz7", "type": "parallelGateway"},
+            {"id": "Activity_10dlls5", "type": "task", "name": "Contact publisher"},
+            {"id": "Activity_08pijh0", "type": "task", "name": "Process payment"},
+            {"id": "Gateway_0hkn0t9", "type": "parallelGateway"},
+            # {"id": "Event_05ig0cp", "type": "endEvent"},
+        ],
+        "edges": [
+            # {"source": "StartEvent_1", "target": "Activity_14k7ctp"},
+            # {"source": "Activity_14k7ctp", "target": "Gateway_1p0lqz7"},
+            {"source": "Gateway_1p0lqz7", "target": "Activity_10dlls5"},
+            {"source": "Gateway_1p0lqz7", "target": "Activity_08pijh0"},
+            {"source": "Activity_08pijh0", "target": "Gateway_0hkn0t9"},
+            {"source": "Activity_10dlls5", "target": "Gateway_0hkn0t9"},
+            # {"source": "Gateway_0hkn0t9", "target": "Event_05ig0cp"},
+        ],
+    }
+
     print("Graph 1 vs Graph 2:")
 
     ged_value = compute_ged(graph_json_1, graph_json_2)
@@ -177,6 +198,15 @@ if __name__ == "__main__":
 
     ged_value = compute_ged(graph_json_1, emtpy_graph)
     rged_value = compute_relative_ged(graph_json_1, emtpy_graph)
+
+    print("Graph Edit Distance:", ged_value)
+    print("Relative Graph Edit Distance:", rged_value)
+    print("Graph similarity:", 1 - rged_value)
+
+    print("\nGraph 1 vs Graph 4:")
+
+    ged_value = compute_ged(graph_json_1, graph_json_4)
+    rged_value = compute_relative_ged(graph_json_1, graph_json_4)
 
     print("Graph Edit Distance:", ged_value)
     print("Relative Graph Edit Distance:", rged_value)
