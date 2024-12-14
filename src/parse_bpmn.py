@@ -1,8 +1,9 @@
 import json
 import xml.etree.ElementTree as ET
+from typing import Optional
 
 
-def parse_bpmn(file_path):
+def parse_bpmn(file_path: str) -> Optional[dict]:
     tree = ET.parse(file_path)
     root = tree.getroot()
 
@@ -12,12 +13,9 @@ def parse_bpmn(file_path):
     process = root.find("bpmn:process", namespaces)
     if process is None:
         print("No process found in the BPMN file.")
-        return
+        return None
 
-    graph_data = {
-        "nodes": [],
-        "edges": []
-    }
+    graph_data = {"nodes": [], "edges": []}
 
     for element in process:
         tag = element.tag.split("}")[-1]  # Remove namespace
@@ -37,7 +35,7 @@ def parse_bpmn(file_path):
     return graph_data
 
 
-def display_graph_info(graph_data):
+def display_graph_info(graph_data: dict) -> None:
     print("Nodes:")
     for node in graph_data["nodes"]:
         print(f"  {node}")
@@ -47,7 +45,7 @@ def display_graph_info(graph_data):
         print(f"  {edge['source']} -> {edge['target']}")
 
 
-def save_graph_to_json(graph_data, output_path):
+def save_graph_to_json(graph_data: dict, output_path: str) -> None:
     with open(output_path, "w") as f:
         json.dump(graph_data, f, indent=2)
 
@@ -57,7 +55,7 @@ if __name__ == "__main__":
     output_json = "graph_data.json"
 
     graph_data = parse_bpmn(file_path)
-    
+
     if graph_data:
         display_graph_info(graph_data)
         save_graph_to_json(graph_data, output_json)

@@ -1,6 +1,6 @@
 import argparse
 
-from ged import compute_ged
+from ged import compute_ged, compute_rged
 from parse_bpmn import parse_bpmn
 
 
@@ -14,10 +14,12 @@ def parse_arguments():
 if __name__ == "__main__":
     args = parse_arguments()
 
-    nodes1, edges1 = parse_bpmn(args.file1)
-    nodes2, edges2 = parse_bpmn(args.file2)
+    graph_1 = parse_bpmn(args.file1)
+    graph_2 = parse_bpmn(args.file2)
 
-    json_graph_1 = {"nodes": nodes1, "edges": edges1}
-    json_graph_2 = {"nodes": nodes2, "edges": edges2}
+    ged = compute_ged(graph_1, graph_2)
+    rged = compute_rged(graph_1, graph_2)
 
-    
+    print(f"Graph Edit Distance (GED): {ged}")
+    print(f"Relative Graph Edit Distance (RGED): {rged:.5f}")
+    print(f"Graph Similarity: {1 - rged:.5f}")

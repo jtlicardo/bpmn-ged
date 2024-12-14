@@ -58,26 +58,16 @@ def compute_ged(json_graph_1: dict, json_graph_2: dict) -> float:
     return nx.algorithms.similarity.graph_edit_distance(G1, G2, node_match=node_match)
 
 
-def compute_relative_ged(json_graph_1: dict, json_graph_2: dict) -> float:
+def compute_rged(json_graph_1: dict, json_graph_2: dict) -> float:
     """
     Compute the Relative Graph Edit Distance (Relative GED) between two graphs given in JSON format.
-    Relative GED = 1 - (GED(G1, G2) / (GED(G1, Empty) + GED(G2, Empty)))
+    Relative GED = (GED(G1, G2) / (GED(G1, Empty) + GED(G2, Empty)))
     """
-    G1 = json_to_digraph(json_graph_1)
-    G2 = json_to_digraph(json_graph_2)
+    empty_graph = {"nodes": [], "edges": []}
 
-    empty_graph = nx.DiGraph()
-
-    ged_G1_G2 = nx.algorithms.similarity.graph_edit_distance(
-        G1, G2, node_match=node_match
-    )
-
-    ged_G1_empty = nx.algorithms.similarity.graph_edit_distance(
-        G1, empty_graph, node_match=node_match
-    )
-    ged_G2_empty = nx.algorithms.similarity.graph_edit_distance(
-        G2, empty_graph, node_match=node_match
-    )
+    ged_G1_G2 = compute_ged(json_graph_1, json_graph_2)
+    ged_G1_empty = compute_ged(json_graph_1, empty_graph)
+    ged_G2_empty = compute_ged(json_graph_2, empty_graph)
 
     return ged_G1_G2 / (ged_G1_empty + ged_G2_empty)
 
@@ -179,7 +169,7 @@ if __name__ == "__main__":
     print("Graph 1 vs Graph 2:")
 
     ged_value = compute_ged(graph_json_1, graph_json_2)
-    rged_value = compute_relative_ged(graph_json_1, graph_json_2)
+    rged_value = compute_rged(graph_json_1, graph_json_2)
 
     print("Graph Edit Distance:", ged_value)
     print("Relative Graph Edit Distance:", rged_value)
@@ -188,7 +178,7 @@ if __name__ == "__main__":
     print("\nGraph 1 vs Graph 3:")
 
     ged_value = compute_ged(graph_json_1, graph_json_3)
-    rged_value = compute_relative_ged(graph_json_1, graph_json_3)
+    rged_value = compute_rged(graph_json_1, graph_json_3)
 
     print("Graph Edit Distance:", ged_value)
     print("Relative Graph Edit Distance:", rged_value)
@@ -197,7 +187,7 @@ if __name__ == "__main__":
     print("\nGraph 1 vs Empty Graph:")
 
     ged_value = compute_ged(graph_json_1, emtpy_graph)
-    rged_value = compute_relative_ged(graph_json_1, emtpy_graph)
+    rged_value = compute_rged(graph_json_1, emtpy_graph)
 
     print("Graph Edit Distance:", ged_value)
     print("Relative Graph Edit Distance:", rged_value)
@@ -206,7 +196,7 @@ if __name__ == "__main__":
     print("\nGraph 1 vs Graph 4:")
 
     ged_value = compute_ged(graph_json_1, graph_json_4)
-    rged_value = compute_relative_ged(graph_json_1, graph_json_4)
+    rged_value = compute_rged(graph_json_1, graph_json_4)
 
     print("Graph Edit Distance:", ged_value)
     print("Relative Graph Edit Distance:", rged_value)
