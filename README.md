@@ -44,3 +44,22 @@ Graph Edit Distance (GED): 3.0
 Relative Graph Edit Distance (RGED): 0.60000
 Graph Similarity: 0.40000
 ```
+
+## Implementation Details
+
+The GED and RGED calculations are implemented in the `ged.py` file.
+
+- `compute_ged`: Computes the Graph Edit Distance (GED) between two graphs.
+- `compute_rged`: Computes the Relative Graph Edit Distance (RGED) between two graphs.
+
+The RGED is calculated as:
+
+$$
+\text{Relative GED} = \frac{\text{GED}(G1, G2)}{\text{GED}(G1, \text{Empty}) + \text{GED}(G2, \text{Empty})}
+$$
+
+The similarity score is calculated as:
+
+$$
+\text{Similarity} = 1 - \text{RGED}
+$$
