@@ -1,21 +1,14 @@
 import networkx as nx
 
+from parse_bpmn import BPMNGraph
 
-def json_to_digraph(json_data: dict) -> nx.DiGraph:
+
+def to_digraph(graph_data: BPMNGraph) -> nx.DiGraph:
     """
-    Convert the given JSON graph structure into a directed graph (DiGraph).
-    Expected JSON format:
-    {
-      "nodes": [
-        {"id": "Node_1", ... },
-        ...
-      ],
-      "edges": [
-        {"source": "Node_1", "target": "Node_2"},
-        ...
-      ]
-    }
+    Convert the given BPMNGraph structure into a directed graph (DiGraph).
     """
+    json_data = graph_data.model_dump()
+
     G = nx.DiGraph()
 
     for node in json_data.get("nodes", []):
@@ -48,22 +41,21 @@ def node_match(n1: dict, n2: dict) -> bool:
     return True
 
 
-def compute_ged(json_graph_1: dict, json_graph_2: dict) -> float:
+def compute_ged(json_graph_1: BPMNGraph, json_graph_2: BPMNGraph) -> float:
     """
     Compute the Graph Edit Distance (GED) between two graphs given in JSON format.
     """
-    G1 = json_to_digraph(json_graph_1)
-    G2 = json_to_digraph(json_graph_2)
-
+    G1 = to_digraph(json_graph_1)
+    G2 = to_digraph(json_graph_2)
     return nx.algorithms.similarity.graph_edit_distance(G1, G2, node_match=node_match)
 
 
-def compute_rged(json_graph_1: dict, json_graph_2: dict) -> float:
+def compute_rged(json_graph_1: BPMNGraph, json_graph_2: BPMNGraph) -> float:
     """
     Compute the Relative Graph Edit Distance (Relative GED) between two graphs given in JSON format.
     Relative GED = (GED(G1, G2) / (GED(G1, Empty) + GED(G2, Empty)))
     """
-    empty_graph = {"nodes": [], "edges": []}
+    empty_graph = BPMNGraph(nodes=[], edges=[])
 
     ged_G1_G2 = compute_ged(json_graph_1, json_graph_2)
     ged_G1_empty = compute_ged(json_graph_1, empty_graph)
@@ -73,8 +65,8 @@ def compute_rged(json_graph_1: dict, json_graph_2: dict) -> float:
 
 
 if __name__ == "__main__":
-    graph_json_1 = {
-        "nodes": [
+    graph_json_1 = BPMNGraph(
+        nodes=[
             {"id": "StartEvent_1", "type": "startEvent"},
             {"id": "Activity_14k7ctp", "type": "task", "name": "Write draft"},
             {"id": "Gateway_1p0lqz7", "type": "parallelGateway"},
@@ -83,7 +75,7 @@ if __name__ == "__main__":
             {"id": "Gateway_0hkn0t9", "type": "parallelGateway"},
             {"id": "Event_05ig0cp", "type": "endEvent"},
         ],
-        "edges": [
+        edges=[
             {"source": "StartEvent_1", "target": "Activity_14k7ctp"},
             {"source": "Activity_14k7ctp", "target": "Gateway_1p0lqz7"},
             {"source": "Gateway_1p0lqz7", "target": "Activity_10dlls5"},
@@ -92,14 +84,14 @@ if __name__ == "__main__":
             {"source": "Activity_10dlls5", "target": "Gateway_0hkn0t9"},
             {"source": "Gateway_0hkn0t9", "target": "Event_05ig0cp"},
         ],
-    }
+    )
 
     # Deleted the end event and its incoming edge -> GED = 2
     # Changed the start event type -> GED = 1
     # Total GED = 3
 
-    graph_json_2 = {
-        "nodes": [
+    graph_json_2 = BPMNGraph(
+        nodes=[
             {"id": "StartEvent_1", "type": "MODIFIED_startEvent"},
             {"id": "Activity_14k7ctp", "type": "task", "name": "Write draft"},
             {"id": "Gateway_1p0lqz7", "type": "parallelGateway"},
@@ -108,7 +100,7 @@ if __name__ == "__main__":
             {"id": "Gateway_0hkn0t9", "type": "parallelGateway"},
             # {"id": "Event_05ig0cp", "type": "endEvent"},
         ],
-        "edges": [
+        edges=[
             {"source": "StartEvent_1", "target": "Activity_14k7ctp"},
             {"source": "Activity_14k7ctp", "target": "Gateway_1p0lqz7"},
             {"source": "Gateway_1p0lqz7", "target": "Activity_10dlls5"},
@@ -117,10 +109,11 @@ if __name__ == "__main__":
             {"source": "Activity_10dlls5", "target": "Gateway_0hkn0t9"},
             # {"source": "Gateway_0hkn0t9", "target": "Event_05ig0cp"},
         ],
-    }
+    )
 
-    graph_json_3 = {
-        "nodes": [
+    # Same as Graph 1
+    graph_json_3 = BPMNGraph(
+        nodes=[
             {"id": "StartEvent_1", "type": "startEvent"},
             {"id": "Activity_14k7ctp", "type": "task", "name": "Write draft"},
             {"id": "Gateway_1p0lqz7", "type": "parallelGateway"},
@@ -129,7 +122,7 @@ if __name__ == "__main__":
             {"id": "Gateway_0hkn0t9", "type": "parallelGateway"},
             {"id": "Event_05ig0cp", "type": "endEvent"},
         ],
-        "edges": [
+        edges=[
             {"source": "StartEvent_1", "target": "Activity_14k7ctp"},
             {"source": "Activity_14k7ctp", "target": "Gateway_1p0lqz7"},
             {"source": "Gateway_1p0lqz7", "target": "Activity_10dlls5"},
@@ -138,15 +131,12 @@ if __name__ == "__main__":
             {"source": "Activity_10dlls5", "target": "Gateway_0hkn0t9"},
             {"source": "Gateway_0hkn0t9", "target": "Event_05ig0cp"},
         ],
-    }
+    )
 
-    emtpy_graph = {
-        "nodes": [],
-        "edges": [],
-    }
+    emtpy_graph = BPMNGraph(nodes=[], edges=[])
 
-    graph_json_4 = {
-        "nodes": [
+    graph_json_4 = BPMNGraph(
+        nodes=[
             # {"id": "StartEvent_1", "type": "MODIFIED_startEvent"},
             # {"id": "Activity_14k7ctp", "type": "task", "name": "Write draft"},
             {"id": "Gateway_1p0lqz7", "type": "parallelGateway"},
@@ -155,7 +145,7 @@ if __name__ == "__main__":
             {"id": "Gateway_0hkn0t9", "type": "parallelGateway"},
             # {"id": "Event_05ig0cp", "type": "endEvent"},
         ],
-        "edges": [
+        edges=[
             # {"source": "StartEvent_1", "target": "Activity_14k7ctp"},
             # {"source": "Activity_14k7ctp", "target": "Gateway_1p0lqz7"},
             {"source": "Gateway_1p0lqz7", "target": "Activity_10dlls5"},
@@ -164,7 +154,7 @@ if __name__ == "__main__":
             {"source": "Activity_10dlls5", "target": "Gateway_0hkn0t9"},
             # {"source": "Gateway_0hkn0t9", "target": "Event_05ig0cp"},
         ],
-    }
+    )
 
     print("Graph 1 vs Graph 2:")
 

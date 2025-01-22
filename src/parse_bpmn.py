@@ -1,9 +1,27 @@
 import json
 import xml.etree.ElementTree as ET
-from typing import Optional
+from typing import List, Optional
+
+from pydantic import BaseModel
 
 
-def parse_bpmn(file_path: str) -> Optional[dict]:
+class Node(BaseModel):
+    id: str
+    type: str
+    name: str | None = None
+
+
+class Edge(BaseModel):
+    source: str
+    target: str
+
+
+class BPMNGraph(BaseModel):
+    nodes: List[Node]
+    edges: List[Edge]
+
+
+def parse_bpmn(file_path: str) -> Optional[BPMNGraph]:
     tree = ET.parse(file_path)
     root = tree.getroot()
 
@@ -32,22 +50,26 @@ def parse_bpmn(file_path: str) -> Optional[dict]:
                 node["name"] = element.attrib["name"]
             graph_data["nodes"].append(node)
 
-    return graph_data
+    return BPMNGraph(**graph_data)
 
 
-def display_graph_info(graph_data: dict) -> None:
+def display_graph_info(graph_data: BPMNGraph) -> None:
     print("Nodes:")
-    for node in graph_data["nodes"]:
-        print(f"  {node}")
+    for node in graph_data.nodes:
+        name_str = f" ({node.name})" if node.name else ""
+        print(f"  {node.id} - {node.type}{name_str}")
 
     print("\nEdges:")
-    for edge in graph_data["edges"]:
-        print(f"  {edge['source']} -> {edge['target']}")
+    for edge in graph_data.edges:
+        print(f"  {edge.source} -> {edge.target}")
 
 
-def save_graph_to_json(graph_data: dict, output_path: str) -> None:
-    with open(output_path, "w") as f:
-        json.dump(graph_data, f, indent=2)
+def save_graph_to_json(graph_data: BPMNGraph, output_path: str) -> None:
+    try:
+        with open(output_path, "w") as f:
+            json.dump(graph_data.model_dump(), f, indent=2)
+    except IOError as e:
+        print(f"Error saving file: {e}")
 
 
 if __name__ == "__main__":

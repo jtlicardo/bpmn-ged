@@ -1,7 +1,7 @@
 import argparse
 
 from ged import compute_ged, compute_rged
-from parse_bpmn import parse_bpmn
+from parse_bpmn import BPMNGraph, parse_bpmn
 
 
 def parse_arguments():
@@ -14,8 +14,8 @@ def parse_arguments():
 if __name__ == "__main__":
     args = parse_arguments()
 
-    graph_1 = parse_bpmn(args.file1)
-    graph_2 = parse_bpmn(args.file2)
+    graph_1: BPMNGraph = parse_bpmn(args.file1)
+    graph_2: BPMNGraph = parse_bpmn(args.file2)
 
     ged = compute_ged(graph_1, graph_2)
     rged = compute_rged(graph_1, graph_2)
