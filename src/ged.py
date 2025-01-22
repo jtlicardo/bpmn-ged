@@ -1,6 +1,6 @@
 import networkx as nx
 
-from parse_bpmn import BPMNGraph
+from schemas import BPMNGraph
 
 
 def to_digraph(graph_data: BPMNGraph) -> nx.DiGraph:

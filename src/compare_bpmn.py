@@ -1,7 +1,8 @@
 import argparse
 
 from ged import compute_ged, compute_rged
-from parse_bpmn import BPMNGraph, parse_bpmn
+from parse_bpmn import parse_bpmn
+from schemas import BPMNGraph
 
 
 def parse_arguments():

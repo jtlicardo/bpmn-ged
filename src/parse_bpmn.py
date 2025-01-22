@@ -1,24 +1,8 @@
 import json
 import xml.etree.ElementTree as ET
-from typing import List, Optional
+from typing import Optional
 
-from pydantic import BaseModel
-
-
-class Node(BaseModel):
-    id: str
-    type: str
-    name: str | None = None
-
-
-class Edge(BaseModel):
-    source: str
-    target: str
-
-
-class BPMNGraph(BaseModel):
-    nodes: List[Node]
-    edges: List[Edge]
+from schemas import BPMNGraph
 
 
 def parse_bpmn(file_path: str) -> Optional[BPMNGraph]:
