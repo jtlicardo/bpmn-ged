@@ -5,10 +5,7 @@ This utility compares two BPMN diagrams using Graph Edit Distance (GED) and Rela
 ## Requirements
 
 - Python 3.12 or higher
-- The following Python packages:
-  - networkx
-  - numpy
-  - scipy
+- uv package manager
 
 ## Installation
 
