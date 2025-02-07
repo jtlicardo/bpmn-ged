@@ -97,19 +97,19 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, model: str = "gpt-4o-
     graph1_normalized = create_normalized_graph(graph1, node_mapping, edge_mapping)
     graph2_normalized = create_normalized_graph(graph2, node_mapping, edge_mapping)
 
-    # Save normalized graphs with timestamp
+    # Save normalized nodes to a file
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"normalized_{timestamp}.json"
     
-    normalized_graphs = {
-        "graph1": graph1_normalized.model_dump(),
-        "graph2": graph2_normalized.model_dump()
+    normalized_nodes = {
+        "graph1": [node.model_dump() for node in graph1_normalized.nodes],
+        "graph2": [node.model_dump() for node in graph2_normalized.nodes]
     }
     
     with open(filename, "w") as f:
-        json.dump(normalized_graphs, f, indent=2)
+        json.dump(normalized_nodes, f, indent=2)
     
-    print(f"Normalized graphs saved to {filename}")
+    print(f"Normalized nodes saved to {filename}")
 
     return graph1_normalized, graph2_normalized
 
