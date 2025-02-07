@@ -31,7 +31,7 @@ uv run src/compare_bpmn.py <path-to-first-bpmn-file> <path-to-second-bpmn-file> 
 
 Options:
 
-- `--model`: Choose the OpenAI model to use for normalization (choices: "gpt-4o-mini", "o3-mini", default: "gpt-4o-mini")
+- `--model`: Choose the OpenAI model to use for normalization (choices: "gpt-4o-mini", "o3-mini")
 
 Example usage:
 
