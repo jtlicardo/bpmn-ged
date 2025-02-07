@@ -32,4 +32,4 @@ class NormalizedEdge(BaseModel):
 
 class NormalizedBPMNGraph(BaseModel):
     nodes: List[NormalizedNode]
-    edges: List[Edge]
+    edges: List[NormalizedEdge]
