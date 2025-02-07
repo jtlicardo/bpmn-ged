@@ -1,6 +1,7 @@
 import json
 import xml.etree.ElementTree as ET
 from typing import Optional
+import argparse
 
 from schemas import BPMNGraph
 
@@ -22,12 +23,13 @@ def parse_bpmn(file_path: str) -> Optional[BPMNGraph]:
     for element in process:
         tag = element.tag.split("}")[-1]  # Remove namespace
         if tag == "sequenceFlow":
-            graph_data["edges"].append(
-                {
-                    "source": element.attrib["sourceRef"],
-                    "target": element.attrib["targetRef"],
-                }
-            )
+            edge = {
+                "source": element.attrib["sourceRef"],
+                "target": element.attrib["targetRef"],
+            }
+            if "name" in element.attrib:
+                edge["name"] = element.attrib["name"]
+            graph_data["edges"].append(edge)
         else:
             node = {"id": element.attrib["id"], "type": tag}
             if "name" in element.attrib:
@@ -45,7 +47,8 @@ def display_graph_info(graph_data: BPMNGraph) -> None:
 
     print("\nEdges:")
     for edge in graph_data.edges:
-        print(f"  {edge.source} -> {edge.target}")
+        name_str = f" [{edge.name}]" if edge.name else ""
+        print(f"  {edge.source} -> {edge.target}{name_str}")
 
 
 def save_graph_to_json(graph_data: BPMNGraph, output_path: str) -> None:
@@ -57,10 +60,12 @@ def save_graph_to_json(graph_data: BPMNGraph, output_path: str) -> None:
 
 
 if __name__ == "__main__":
-    file_path = "models/first.bpmn"
-    output_json = "graph_data.json"
+    parser = argparse.ArgumentParser(description='Parse BPMN file to graph structure')
+    parser.add_argument('input_file', help='Path to input BPMN file')
+    args = parser.parse_args()
 
-    graph_data = parse_bpmn(file_path)
+    output_json = "graph_data.json"
+    graph_data = parse_bpmn(args.input_file)
 
     if graph_data:
         display_graph_info(graph_data)
