@@ -10,31 +10,40 @@ This utility compares two BPMN diagrams using Graph Edit Distance (GED) and Rela
 ## Installation
 
 1. Clone the repository:
-    ```sh
-    git clone https://github.com/jtlicardo/bpmn-ged
-    cd bpmn-ged
-    ```
+
+   ```sh
+   git clone https://github.com/jtlicardo/bpmn-ged
+   cd bpmn-ged
+   ```
 
 2. Install `uv` package manager:
-    ```sh
-    pip install uv
-    ```
+   ```sh
+   pip install uv
+   ```
 
 ## Usage
 
 To compare two BPMN files, run the following command:
 
 ```sh
-uv run src/compare_bpmn.py <path-to-first-bpmn-file> <path-to-second-bpmn-file>
+uv run src/compare_bpmn.py <path-to-first-bpmn-file> <path-to-second-bpmn-file> [--model MODEL]
 ```
 
-For example:
+Options:
+
+- `--model`: Choose the OpenAI model to use for normalization (choices: "gpt-4o-mini", "o3-mini", default: "gpt-4o-mini")
+
+Example usage:
 
 ```sh
-uv run src/compare_bpmn.py models/first.bpmn models/second.bpmn
+# Using default model (gpt-4o-mini)
+uv run src/compare_bpmn.py model1.bpmn model2.bpmn
+
+# Using o3-mini model
+uv run src/compare_bpmn.py model1.bpmn model2.bpmn --model o3-mini
 ```
 
-Example output
+Example output:
 
 ```sh
 Graph Edit Distance (GED): 3.0
