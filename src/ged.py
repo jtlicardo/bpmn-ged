@@ -25,14 +25,6 @@ def to_digraph(graph_data: NormalizedBPMNGraph) -> nx.DiGraph:
     return G
 
 
-def node_match(n1: dict, n2: dict) -> bool:
-    """
-    Compare if two nodes are equal based on their attributes.
-    Returns True if the nodes should be considered equal, False otherwise.
-    """
-    return (n1["type"] == n2["type"] and 
-            n1["normalized_name"] == n2["normalized_name"])
-
 
 def edge_match(e1: dict, e2: dict) -> bool:
     """
@@ -40,6 +32,32 @@ def edge_match(e1: dict, e2: dict) -> bool:
     Returns True if the edges should be considered equal, False otherwise.
     """
     return e1["normalized_name"] == e2["normalized_name"]
+
+
+def node_subst_cost(n1: dict, n2: dict) -> float:
+    """
+    Calculate the substitution cost between two nodes.
+    Returns:
+    - 0.0: perfect match (same type and normalized name)
+    - 0.3: partial match (different type but same normalized name)
+    - 1.0: complete mismatch
+    """
+    name_match = n1["normalized_name"] == n2["normalized_name"]
+    type_match = n1["type"] == n2["type"]
+    
+    if name_match and type_match:
+        return 0.0
+    elif name_match:  # Only names match, types are different
+        return 0.5
+    return 1.0
+
+
+def node_ins_cost(n: dict) -> float:
+    return 1.0
+
+
+def node_del_cost(n: dict) -> float:
+    return 1.0
 
 
 def compute_ged(json_graph_1: NormalizedBPMNGraph, json_graph_2: NormalizedBPMNGraph) -> float:
@@ -50,7 +68,9 @@ def compute_ged(json_graph_1: NormalizedBPMNGraph, json_graph_2: NormalizedBPMNG
     G2 = to_digraph(json_graph_2)
     return nx.algorithms.similarity.graph_edit_distance(
         G1, G2, 
-        node_match=node_match,
+        node_subst_cost=node_subst_cost,
+        node_ins_cost=node_ins_cost,
+        node_del_cost=node_del_cost,
         edge_match=edge_match
     )
 
