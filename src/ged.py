@@ -39,7 +39,7 @@ def node_subst_cost(n1: dict, n2: dict) -> float:
     Calculate the substitution cost between two nodes.
     Returns:
     - 0.0: perfect match (same type and normalized name)
-    - 0.3: partial match (different type but same normalized name)
+    - 0.5: partial match (different type but same normalized name)
     - 1.0: complete mismatch
     """
     name_match = n1["normalized_name"] == n2["normalized_name"]
