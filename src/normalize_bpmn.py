@@ -33,7 +33,9 @@ PROMPT = """Normalize BPMN tasks, events, and sequence flow labels:
 - Only output original_name and normalized_name pairs
 - Same tasks/events/labels get same normalized names ONLY if they are semantically similar
 - Different/unrelated tasks/events MUST get different normalized names
-- Consider node sequence via edges"""
+- Consider node sequence via edges
+- Only normalize elements that have labels/names - ignore unlabeled elements (do not normalize null values)
+- Do not normalize IDs, only normalize labels/names"""
 
 def create_normalized_graph(graph: BPMNGraph, node_mapping: dict, edge_mapping: dict) -> NormalizedBPMNGraph:
     """
@@ -97,19 +99,23 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, model: str = "gpt-4o-
     graph1_normalized = create_normalized_graph(graph1, node_mapping, edge_mapping)
     graph2_normalized = create_normalized_graph(graph2, node_mapping, edge_mapping)
 
-    # Save normalized graphs with timestamp
+    # Save normalized graphs and mappings with timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"normalized_{timestamp}.json"
     
-    normalized_graphs = {
+    output_data = {
         "graph1": graph1_normalized.model_dump(),
-        "graph2": graph2_normalized.model_dump()
+        "graph2": graph2_normalized.model_dump(),
+        "mappings": {
+            "nodes": node_mapping,
+            "edges": edge_mapping
+        }
     }
     
     with open(filename, "w") as f:
-        json.dump(normalized_graphs, f, indent=2)
+        json.dump(output_data, f, indent=2)
     
-    print(f"Normalized graphs saved to {filename}")
+    print(f"Normalized graphs and mappings saved to {filename}")
 
     return graph1_normalized, graph2_normalized
 
