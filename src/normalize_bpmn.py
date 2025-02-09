@@ -26,13 +26,13 @@ class NormalizationResponse(BaseModel):
     node_mappings: List[NodeNormalizationMapping]
     edge_mappings: List[EdgeNormalizationMapping]
 
-PROMPT = """Normalize BPMN tasks and sequence flow labels:
-- Match semantically similar tasks and flow labels
-- Use 'A', 'B', 'C', etc. as normalized names for tasks
+PROMPT = """Normalize BPMN tasks, events, and sequence flow labels:
+- Match semantically similar tasks, events, and flow labels
+- Use 'A', 'B', 'C', etc. as normalized names for tasks and events
 - Use '1', '2', '3', etc. as normalized names for flow labels
 - Only output original_name and normalized_name pairs
-- Same tasks/labels get same normalized names ONLY if they are semantically similar
-- Different/unrelated tasks MUST get different normalized names
+- Same tasks/events/labels get same normalized names ONLY if they are semantically similar
+- Different/unrelated tasks/events MUST get different normalized names
 - Consider node sequence via edges"""
 
 def create_normalized_graph(graph: BPMNGraph, node_mapping: dict, edge_mapping: dict) -> NormalizedBPMNGraph:
