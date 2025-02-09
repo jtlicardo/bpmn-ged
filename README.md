@@ -21,6 +21,18 @@ This utility compares two BPMN diagrams using Graph Edit Distance (GED) and Rela
    pip install uv
    ```
 
+## Configuration
+
+1. Create a file named `.env` in the root directory of the project.
+
+2. Add your OpenAI API key to the `.env` file:
+
+   ```
+   OPENAI_API_KEY='your-api-key-here'
+   ```
+
+   You can obtain an API key from the [OpenAI platform](https://platform.openai.com/api-keys).
+
 ## Usage
 
 To compare two BPMN files, run the following command:
