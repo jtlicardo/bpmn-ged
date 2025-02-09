@@ -2,6 +2,8 @@
 
 This utility compares two BPMN diagrams using Graph Edit Distance (GED) and Relative Graph Edit Distance (RGED).
 
+The tool performs semantic label normalization using OpenAI's language models to ensure that similar concepts are matched correctly, even when expressed differently (e.g., "Process order" and "Handle order" would be normalized to the same label).
+
 ## Requirements
 
 - Python 3.12 or higher
