@@ -26,7 +26,7 @@ if __name__ == "__main__":
     graph_1: BPMNGraph = parse_bpmn(args.file1)
     graph_2: BPMNGraph = parse_bpmn(args.file2)
 
-    normalized_graph_1, normalized_graph_2 = normalize_graphs(graph_1, graph_2, model=args.model)
+    normalized_graph_1, normalized_graph_2 = normalize_graphs(graph_1, graph_2, args.file1, model=args.model)
 
     ged = compute_ged(normalized_graph_1, normalized_graph_2)
     rged = compute_rged(normalized_graph_1, normalized_graph_2)

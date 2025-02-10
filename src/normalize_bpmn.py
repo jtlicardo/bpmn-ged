@@ -34,7 +34,7 @@ PROMPT = """Normalize BPMN tasks, events, and sequence flow labels:
 - Same tasks/events/labels get same normalized names ONLY if they are semantically similar
 - Different/unrelated tasks/events MUST get different normalized names
 - Consider node sequence via edges
-- Only normalize elements that have labels/names - ignore unlabeled elements (do not normalize null values)
+- Only normalize nodes and edges that have labels/names - ignore unlabeled nodes and edges (do not normalize null values)
 - Do not normalize IDs, only normalize labels/names"""
 
 def create_normalized_graph(graph: BPMNGraph, node_mapping: dict, edge_mapping: dict) -> NormalizedBPMNGraph:
@@ -63,7 +63,7 @@ def create_normalized_graph(graph: BPMNGraph, node_mapping: dict, edge_mapping: 
     
     return NormalizedBPMNGraph(nodes=normalized_nodes, edges=normalized_edges)
 
-def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, model: str = "gpt-4o-mini") -> tuple[NormalizedBPMNGraph, NormalizedBPMNGraph]:
+def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, model: str = "gpt-4o-mini") -> tuple[NormalizedBPMNGraph, NormalizedBPMNGraph]:
     load_dotenv(override=True)
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -99,9 +99,13 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, model: str = "gpt-4o-
     graph1_normalized = create_normalized_graph(graph1, node_mapping, edge_mapping)
     graph2_normalized = create_normalized_graph(graph2, node_mapping, edge_mapping)
 
-    # Save normalized graphs and mappings with timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"normalized_{timestamp}.json"
+    # Create normalized_graphs directory if it doesn't exist
+    output_dir = "normalized_graphs"
+    os.makedirs(output_dir, exist_ok=True)
+
+     # Extract base filename without extension and path
+    base_filename = os.path.splitext(os.path.basename(source_file))[0]
+    filename = os.path.join(output_dir, f"{base_filename}_normalized.json")
     
     output_data = {
         "graph1": graph1_normalized.model_dump(),
@@ -123,5 +127,5 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, model: str = "gpt-4o-
 if __name__ == "__main__":
     graph1 = parse_bpmn("models/first.bpmn")
     graph2 = parse_bpmn("models/second.bpmn")
-    _, _ = normalize_graphs(graph1, graph2)
+    _, _ = normalize_graphs(graph1, graph2, "models/first.bpmn")
 
