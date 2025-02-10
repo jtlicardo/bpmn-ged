@@ -89,7 +89,7 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, mod
     completion = client.beta.chat.completions.parse(**completion_args)
 
     print(f"Input tokens: {completion.usage.prompt_tokens}")
-    print(f"Reasoning tokens: {completion.usage.completion_tokens_details.reasoning_tokens}")
+    # print(f"Reasoning tokens: {completion.usage.completion_tokens_details.reasoning_tokens}")
     print(f"Output tokens: {completion.usage.completion_tokens}")
 
     # Create normalized graphs using the mappings from LLM
@@ -119,8 +119,6 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, mod
     with open(filename, "w") as f:
         json.dump(output_data, f, indent=2)
     
-    print(f"Normalized graphs and mappings saved to {filename}")
-
     return graph1_normalized, graph2_normalized
 
 
