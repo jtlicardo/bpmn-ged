@@ -71,7 +71,8 @@ def compute_ged(json_graph_1: NormalizedBPMNGraph, json_graph_2: NormalizedBPMNG
         node_subst_cost=node_subst_cost,
         node_ins_cost=node_ins_cost,
         node_del_cost=node_del_cost,
-        edge_match=edge_match
+        edge_match=edge_match,
+        timeout=10.0
     )
 
 
