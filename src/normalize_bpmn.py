@@ -14,32 +14,59 @@ class NormalizationRequest(BaseModel):
     e1: List[dict]  # first graph edges
     e2: List[dict]  # second graph edges
 
-class EdgeNormalizationMapping(BaseModel):
-    original_name: str | None
-    normalized_name: str | None
 
-class NodeNormalizationMapping(BaseModel):
+
+class NormalizationMapping(BaseModel):
     original_name: str
     normalized_name: str
 
 class NormalizationResponse(BaseModel):
-    node_mappings: List[NodeNormalizationMapping]
-    edge_mappings: List[EdgeNormalizationMapping]
+    name_mappings: List[NormalizationMapping]
 
-PROMPT = """Normalize BPMN tasks, events, and sequence flow labels:
-- Match semantically similar tasks, events, and flow labels
-- Use 'A', 'B', 'C', etc. as normalized names for tasks and events
-- Use '1', '2', '3', etc. as normalized names for flow labels
-- Only output original_name and normalized_name pairs
-- Same tasks/events/labels get same normalized names ONLY if they are semantically similar
-- Different/unrelated tasks/events MUST get different normalized names
-- Consider node sequence via edges
-- Only normalize nodes and edges that have labels/names - ignore unlabeled nodes and edges (do not normalize null values)
-- Do not normalize IDs, only normalize labels/names"""
+PROMPT = """Normalize BPMN task, event, and sequence flow labels by mapping them to simple letter names (A, B, C, etc.):
+- Match semantically similar elements (tasks, events, flows)
+- Use ONLY letters (A, B, C, etc.) as normalized names for ALL elements
+- Same elements get same letters ONLY if they are semantically similar
+- Different/unrelated elements MUST get different letters
+- Consider element sequence via edges
+- Only normalize elements that have labels/names - ignore unlabeled elements
+- Do not normalize IDs, only normalize labels/names
 
-def create_normalized_graph(graph: BPMNGraph, node_mapping: dict, edge_mapping: dict) -> NormalizedBPMNGraph:
+Examples:
+
+Input:
+{
+  "g1": [
+    {"name": "Submit order", "type": "task", "id": "1"},
+    {"name": "Process payment", "type": "task", "id": "2"}
+  ],
+  "g2": [
+    {"name": "Send order", "type": "task", "id": "task_1"},
+    {"name": "Handle payment", "type": "task", "id": "task_2"}
+  ],
+  "e1": [
+    {"name": "Order submitted", "source": "1", "target": "2"}
+  ],
+  "e2": [
+    {"name": "Order sent", "source": "task_1", "target": "task_2"}
+  ]
+}
+
+Expected Output:
+{
+  "name_mappings": [
+    {"original_name": "Submit order", "normalized_name": "A"},
+    {"original_name": "Send order", "normalized_name": "A"},
+    {"original_name": "Process payment", "normalized_name": "B"},
+    {"original_name": "Handle payment", "normalized_name": "B"},
+    {"original_name": "Order submitted", "normalized_name": "C"},
+    {"original_name": "Order sent", "normalized_name": "C"}
+  ]
+}"""
+
+def create_normalized_graph(graph: BPMNGraph, name_mapping: dict) -> NormalizedBPMNGraph:
     """
-    Create a normalized graph from the given graph using the provided node and edge mappings.
+    Create a normalized graph from the given graph using the provided name mappings.
     """
     normalized_nodes = []
     for node in graph.nodes:
@@ -47,7 +74,7 @@ def create_normalized_graph(graph: BPMNGraph, node_mapping: dict, edge_mapping: 
             id=node.id,
             type=node.type,
             original_name=node.name,
-            normalized_name=node_mapping.get(node.name) if node.name else None
+            normalized_name=name_mapping.get(node.name) if node.name else None
         )
         normalized_nodes.append(normalized_node)
     
@@ -57,7 +84,7 @@ def create_normalized_graph(graph: BPMNGraph, node_mapping: dict, edge_mapping: 
             source=edge.source,
             target=edge.target,
             original_name=edge.name,
-            normalized_name=edge_mapping.get(edge.name) if edge.name else None
+            normalized_name=name_mapping.get(edge.name) if edge.name else None
         )
         normalized_edges.append(normalized_edge)
     
@@ -88,16 +115,15 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, mod
 
     completion = client.beta.chat.completions.parse(**completion_args)
 
-    print(f"Input tokens: {completion.usage.prompt_tokens}")
+    # print(f"Input tokens: {completion.usage.prompt_tokens}")
     # print(f"Reasoning tokens: {completion.usage.completion_tokens_details.reasoning_tokens}")
     print(f"Output tokens: {completion.usage.completion_tokens}")
 
     # Create normalized graphs using the mappings from LLM
-    node_mapping = {m.original_name: m.normalized_name for m in completion.choices[0].message.parsed.node_mappings}
-    edge_mapping = {m.original_name: m.normalized_name for m in completion.choices[0].message.parsed.edge_mappings}
+    name_mapping = {m.original_name: m.normalized_name for m in completion.choices[0].message.parsed.name_mappings}
 
-    graph1_normalized = create_normalized_graph(graph1, node_mapping, edge_mapping)
-    graph2_normalized = create_normalized_graph(graph2, node_mapping, edge_mapping)
+    graph1_normalized = create_normalized_graph(graph1, name_mapping)
+    graph2_normalized = create_normalized_graph(graph2, name_mapping)
 
     # Create normalized_graphs directory if it doesn't exist
     output_dir = "normalized_graphs"
@@ -110,10 +136,7 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, mod
     output_data = {
         "graph1": graph1_normalized.model_dump(),
         "graph2": graph2_normalized.model_dump(),
-        "mappings": {
-            "nodes": node_mapping,
-            "edges": edge_mapping
-        }
+        "mappings": name_mapping
     }
     
     with open(filename, "w") as f:
