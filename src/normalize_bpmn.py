@@ -6,7 +6,6 @@ from parse_bpmn import parse_bpmn
 from dotenv import load_dotenv
 import os
 import json
-from datetime import datetime
 
 class NormalizationRequest(BaseModel):
     g1: List[dict]  # first graph nodes
@@ -104,7 +103,7 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, mod
     completion_args = {
         "model": model,
         "messages": [
-            {"role": "developer", "content": PROMPT},
+            {"role": "system", "content": PROMPT},
             {"role": "user", "content": str(request.model_dump())}
         ],
         "response_format": NormalizationResponse
@@ -112,6 +111,8 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, mod
 
     if model == "o3-mini":
         completion_args["reasoning_effort"] = "low"
+    else:
+        completion_args["temperature"] = 0.1
 
     completion = client.beta.chat.completions.parse(**completion_args)
 
