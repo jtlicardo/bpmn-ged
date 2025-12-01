@@ -12,5 +12,6 @@ wheels/
 .env
 
 *.bpmn
+*.csv
 
 normalized_graphs/
