@@ -22,6 +22,8 @@ class NormalizationMapping(BaseModel):
 class NormalizationResponse(BaseModel):
     name_mappings: List[NormalizationMapping]
 
+MODEL = "gpt-5-mini"
+
 PROMPT = """Normalize BPMN task, event, and sequence flow labels by mapping them to simple letter names (A, B, C, etc.):
 - Match semantically similar elements (tasks, events, flows)
 - Use ONLY letters (A, B, C, etc.) as normalized names for ALL elements
@@ -89,7 +91,7 @@ def create_normalized_graph(graph: BPMNGraph, name_mapping: dict) -> NormalizedB
     
     return NormalizedBPMNGraph(nodes=normalized_nodes, edges=normalized_edges)
 
-def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, model: str = "gpt-4o-mini") -> tuple[NormalizedBPMNGraph, NormalizedBPMNGraph]:
+def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str) -> tuple[NormalizedBPMNGraph, NormalizedBPMNGraph]:
     load_dotenv(override=True)
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -101,7 +103,7 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, mod
     )
 
     completion_args = {
-        "model": model,
+        "model": MODEL,
         "messages": [
             {"role": "system", "content": PROMPT},
             {"role": "user", "content": str(request.model_dump())}
@@ -109,10 +111,6 @@ def normalize_graphs(graph1: BPMNGraph, graph2: BPMNGraph, source_file: str, mod
         "response_format": NormalizationResponse
     }
 
-    if model == "o3-mini":
-        completion_args["reasoning_effort"] = "low"
-    else:
-        completion_args["temperature"] = 0.1
 
     completion = client.beta.chat.completions.parse(**completion_args)
 
@@ -150,4 +148,3 @@ if __name__ == "__main__":
     graph1 = parse_bpmn("models/first.bpmn")
     graph2 = parse_bpmn("models/second.bpmn")
     _, _ = normalize_graphs(graph1, graph2, "models/first.bpmn")
-

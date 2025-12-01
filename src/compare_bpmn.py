@@ -10,13 +10,6 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Compare two BPMN files")
     parser.add_argument("file1", type=str, help="Path to the first BPMN file")
     parser.add_argument("file2", type=str, help="Path to the second BPMN file")
-    parser.add_argument(
-        "--model", 
-        type=str, 
-        choices=["gpt-4o-mini", "o3-mini"],
-        default="gpt-4o-mini",
-        help="Choose the OpenAI model to use for normalization"
-    )
     return parser.parse_args()
 
 
@@ -26,7 +19,7 @@ if __name__ == "__main__":
     graph_1: BPMNGraph = parse_bpmn(args.file1)
     graph_2: BPMNGraph = parse_bpmn(args.file2)
 
-    normalized_graph_1, normalized_graph_2 = normalize_graphs(graph_1, graph_2, args.file1, model=args.model)
+    normalized_graph_1, normalized_graph_2 = normalize_graphs(graph_1, graph_2, args.file1)
 
     ged = compute_ged(normalized_graph_1, normalized_graph_2)
     rged = compute_rged(normalized_graph_1, normalized_graph_2)

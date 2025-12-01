@@ -40,22 +40,16 @@ The tool performs semantic label normalization using OpenAI's language models to
 To compare two BPMN files, run the following command:
 
 ```sh
-uv run src/compare_bpmn.py <path-to-first-bpmn-file> <path-to-second-bpmn-file> [--model MODEL]
+uv run src/compare_bpmn.py <path-to-first-bpmn-file> <path-to-second-bpmn-file>
 ```
-
-Options:
-
-- `--model`: Choose the OpenAI model to use for normalization (choices: "gpt-4o-mini", "o3-mini")
 
 Example usage:
 
 ```sh
-# Using default model (gpt-4o-mini)
 uv run src/compare_bpmn.py model1.bpmn model2.bpmn
-
-# Using o3-mini model
-uv run src/compare_bpmn.py model1.bpmn model2.bpmn --model o3-mini
 ```
+
+The tool uses the `gpt-5-mini` model for normalization by default.
 
 Example output:
 

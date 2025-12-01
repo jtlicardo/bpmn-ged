@@ -22,13 +22,6 @@ def parse_arguments():
     parser.add_argument("ground_truth_dir", type=str, help="Path to the ground truth BPMN files directory")
     parser.add_argument("comparison_dir", type=str, help="Path to the comparison BPMN files directory")
     parser.add_argument(
-        "--model", 
-        type=str, 
-        choices=["gpt-4o-mini", "o3-mini"],
-        default="gpt-4o-mini",
-        help="Choose the OpenAI model to use for normalization"
-    )
-    parser.add_argument(
         "--output", 
         type=str,
         default=None,
@@ -46,8 +39,7 @@ def process_file_pair(args: Dict[str, Any]) -> ComparisonResult | None:
         normalized_graph_1, normalized_graph_2 = normalize_graphs(
             graph_1, 
             graph_2, 
-            str(args['ground_truth_path']),
-            model=args['model']
+            str(args['ground_truth_path'])
         )
         
         ged = compute_ged(normalized_graph_1, normalized_graph_2)
@@ -65,7 +57,7 @@ def process_file_pair(args: Dict[str, Any]) -> ComparisonResult | None:
         print(f"Error processing {args['filename']}: {str(e)}")
         return None
 
-def evaluate_bpmn_directories(ground_truth_dir: str, comparison_dir: str, model: str, output_file: str | None = None):
+def evaluate_bpmn_directories(ground_truth_dir: str, comparison_dir: str, output_file: str | None = None):
     results_dir = "evaluation_results"
     os.makedirs(results_dir, exist_ok=True)
 
@@ -88,7 +80,6 @@ def evaluate_bpmn_directories(ground_truth_dir: str, comparison_dir: str, model:
             'filename': filename,
             'ground_truth_path': ground_truth_path,
             'comparison_path': comparison_path,
-            'model': model
         })
 
     results = []
@@ -129,6 +120,5 @@ if __name__ == "__main__":
     evaluate_bpmn_directories(
         args.ground_truth_dir,
         args.comparison_dir,
-        args.model,
         args.output
     )
